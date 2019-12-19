@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "*"
+sqlalchemy = "*"
+python-dotenv = "*"
+python-decouple = "*"
+flask-sqlalchemy = "*"
+swapi = "*"
+py-openaq = "*"
+pandas = "*"
+gunicorn = "*"
+psycopg2 = "*"
+joblib = "*"
+scikit-learn = "*"
+category-encoders = "==2.0.0"
+
+[requires]
+python_version = "3.7"
