@@ -1,7 +1,7 @@
 # Import Flask package
 
 from decouple import config
-from flask import Flask, render_template
+from flask import Flask, request, render_template
 from AIRBNB.models import DB
 
 from joblib import load
@@ -51,6 +51,39 @@ def create_app():
         result = out_string + f'${y_pred:,.0f}'
 
         return render_template('home.html', title='Prediction', result=result)
+
+    @app.route('/prediction', methods=['GET'])
+    def api_return():
+
+        if 'id' in request.args:
+            id = int(request.args['id'])
+
+            id = id + 0
+            month = 12
+            year = 19
+            property_type = 'House'
+            room_type = 'Entire home/apt'
+            neighbourhood = 'East Downtown'
+            accommodates = 4
+            bedrooms = 2
+            bathrooms = 2
+            beds = 2
+
+            df = pd.DataFrame(
+                columns=['month', 'year', 'property_type', 'room_type',
+                         'neighbourhood', 'accommodates', 'bedrooms',
+                         'bathrooms', 'beds'],
+                data=[[month, year, property_type, room_type, neighbourhood,
+                       accommodates, bedrooms, bathrooms, beds]]
+            )
+            pipeline = load('pipeline.joblib')
+            y_pred_log = pipeline.predict(df)
+            y_pred = y_pred_log[0]
+
+        else:
+            return "Error: no id field provided"
+
+        return str(y_pred)
 
     @app.route('/reset')
     def reset():
