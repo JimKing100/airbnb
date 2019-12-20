@@ -83,7 +83,9 @@ def create_app():
         else:
             return "Error: no id field provided"
 
-        return str(y_pred)
+        output_str = '{prediction: ' + str(int(y_pred)) + '}'
+
+        return output_str
 
     @app.route('/reset')
     def reset():
