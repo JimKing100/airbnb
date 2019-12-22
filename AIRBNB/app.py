@@ -1,10 +1,15 @@
 # Import Flask package
 
 from decouple import config
-from flask import Flask, request, render_template
+from flask import Flask, request, jsonify, render_template
 from AIRBNB.models import DB
+from AIRBNB.explain import explains
 
-from joblib import load
+import category_encoders as ce
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LinearRegression
+
 import pandas as pd
 
 
@@ -44,9 +49,34 @@ def create_app():
                    accommodates, bedrooms, bathrooms, beds]]
         )
 
-        pipeline = load('pipeline.joblib')
-        y_pred_log = pipeline.predict(df)
-        y_pred = y_pred_log[0]
+        train = pd.read_csv('https://raw.githubusercontent.com/JimKing100/airbnb-app-4/master/Datascience/data/train.csv')
+        train = train.drop(columns=['old_index'])
+        target = 'price'
+
+        features = train.columns.drop(target)
+        X_train = train[features]
+        y_train = train[target]
+
+        pipeline = make_pipeline(
+            ce.OrdinalEncoder(),
+            LinearRegression()
+        )
+
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(df)
+        y_pred = y_pred[0]
+
+        transformers = make_pipeline(
+            ce.OrdinalEncoder(),
+            SimpleImputer(strategy='mean')
+        )
+
+        X_train_transformed = transformers.fit_transform(X_train)
+
+        model = LinearRegression()
+        model.fit(X_train_transformed, y_train)
+
+        pro, con = explains(df, model, X_train_transformed, transformers, 0)
 
         result = out_string + f'${y_pred:,.0f}'
 
@@ -76,14 +106,44 @@ def create_app():
                 data=[[month, year, property_type, room_type, neighbourhood,
                        accommodates, bedrooms, bathrooms, beds]]
             )
-            pipeline = load('pipeline.joblib')
-            y_pred_log = pipeline.predict(df)
-            y_pred = y_pred_log[0]
+
+            train = pd.read_csv('https://raw.githubusercontent.com/JimKing100/airbnb-app-4/master/Datascience/data/train.csv')
+            train = train.drop(columns=['old_index'])
+            target = 'price'
+
+            features = train.columns.drop(target)
+            X_train = train[features]
+            y_train = train[target]
+
+            pipeline = make_pipeline(
+                ce.OrdinalEncoder(),
+                LinearRegression()
+            )
+
+            pipeline.fit(X_train, y_train)
+            y_pred = pipeline.predict(df)
+            y_pred = y_pred[0]
+
+            transformers = make_pipeline(
+                ce.OrdinalEncoder(),
+                SimpleImputer(strategy='mean')
+            )
+
+            X_train_transformed = transformers.fit_transform(X_train)
+
+            model = LinearRegression()
+            model.fit(X_train_transformed, y_train)
+
+            pro, con = explains(df, model, X_train_transformed, transformers, 0)
+
+            output_str = jsonify(prediction=str(int(y_pred)),
+                                 pros1=pro[0],
+                                 pros2=pro[1],
+                                 cons1=con[0],
+                                 cons2=con[1])
 
         else:
             return "Error: no id field provided"
-
-        output_str = '{prediction: ' + str(int(y_pred)) + '}'
 
         return output_str
 
