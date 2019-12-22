@@ -2,10 +2,9 @@
 
 from decouple import config
 from flask import Flask, request, jsonify, render_template
-from AIRBNB.models import DB, listings, property_types, neighborhoods
+from AIRBNB.models import DB, listings
 from AIRBNB.explain import explains
 from AIRBNB.initialize import init_db
-from AIRBNB.testdata import add_test_data
 
 import category_encoders as ce
 from sklearn.impute import SimpleImputer
@@ -157,6 +156,5 @@ def create_app():
         DB.drop_all()
         DB.create_all()
         init_db()
-        add_test_data()
         return render_template('db.html', title='DB Reset')
     return app
