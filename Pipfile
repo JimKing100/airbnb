@@ -19,6 +19,8 @@ psycopg2 = "*"
 joblib = "*"
 scikit-learn = "*"
 category-encoders = "==2.0.0"
+shapely = "*"
+shap = "*"
 
 [requires]
 python_version = "3.7"
