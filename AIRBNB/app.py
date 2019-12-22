@@ -2,8 +2,10 @@
 
 from decouple import config
 from flask import Flask, request, jsonify, render_template
-from AIRBNB.models import DB
+from AIRBNB.models import DB, listings, property_types, neighborhoods
 from AIRBNB.explain import explains
+from AIRBNB.initialize import init_db
+from AIRBNB.testdata import add_test_data
 
 import category_encoders as ce
 from sklearn.impute import SimpleImputer
@@ -27,13 +29,15 @@ def create_app():
 
         month = 12
         year = 19
-        property_type = 'House'
-        room_type = 'Entire home/apt'
-        neighbourhood = 'East Downtown'
-        accommodates = 4
-        bedrooms = 2
-        bathrooms = 2
-        beds = 2
+        listing = listings.query.get(1)
+
+        property_type = listing.property_type.property_type
+        room_type = listing.room_types
+        neighbourhood = listing.neighborhood.neighborhood
+        accommodates = listing.accommodates
+        bedrooms = listing.bedrooms
+        bathrooms = listing.bathrooms
+        beds = listing.bedrooms
         out_string = 'The predicted price for a ' + \
                      property_type.lower() + ' in the ' + \
                      neighbourhood + ' neighborhood '\
@@ -88,16 +92,17 @@ def create_app():
         if 'id' in request.args:
             id = int(request.args['id'])
 
-            id = id + 0
             month = 12
             year = 19
-            property_type = 'House'
-            room_type = 'Entire home/apt'
-            neighbourhood = 'East Downtown'
-            accommodates = 4
-            bedrooms = 2
-            bathrooms = 2
-            beds = 2
+            listing = listings.query.get(id)
+
+            property_type = listing.property_type.property_type
+            room_type = listing.room_types
+            neighbourhood = listing.neighborhood.neighborhood
+            accommodates = listing.accommodates
+            bedrooms = listing.bedrooms
+            bathrooms = listing.bathrooms
+            beds = listing.bedrooms
 
             df = pd.DataFrame(
                 columns=['month', 'year', 'property_type', 'room_type',
@@ -151,5 +156,7 @@ def create_app():
     def reset():
         DB.drop_all()
         DB.create_all()
+        init_db()
+        add_test_data()
         return render_template('db.html', title='DB Reset')
     return app
