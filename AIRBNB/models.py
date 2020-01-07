@@ -8,12 +8,14 @@ DB = SQLAlchemy()
 class users(DB.Model):
     id = DB.Column(DB.Integer, primary_key=True)
     email = DB.Column(DB.String(355), nullable=False)
+    password = DB.Column(DB.String(60), nullable=False)
     first_name = DB.Column(DB.String(60), nullable=False)
     last_name = DB.Column(DB.String(60), nullable=False)
     city = DB.Column(DB.String(255))
+    zip_code = DB.Column(DB.SmallInteger)
     state = DB.Column(DB.String(2))
     date_of_birth = DB.Column(DB.Date)
-    profile_image_id = DB.Column(DB.Integer)
+    profile_image = DB.Column(DB.String(255))
 
     def __repr__(self):
         return '<users {}>'.format(self.name)
