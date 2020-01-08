@@ -12,7 +12,7 @@ class users(DB.Model):
     first_name = DB.Column(DB.String(255), nullable=False)
     last_name = DB.Column(DB.String(255), nullable=False)
     city = DB.Column(DB.String(255))
-    zip_code = DB.Column(DB.SmallInteger)
+    zip_code = DB.Column(DB.Integer)
     state = DB.Column(DB.String(2))
     date_of_birth = DB.Column(DB.Date)
     profile_image = DB.Column(DB.String(255))
